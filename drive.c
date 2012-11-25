@@ -29,11 +29,17 @@ bool isRunning = true; // specifies wether the robot is not in E-STOP mode - wil
 int quadrent = 0;
 
 // values set throughout the program
-float leftmotorval = 0;
-float rightmotorval = 0;
+
 float leftstickval = 0;
 float rightstickval = 0;
 float newrightstickval = 0;
+
+// global speeds of drive motors
+float leftmotorval = 0;
+float rightmotorval = 0;
+
+// target positions for extremities, lengths in inches, angles in degrees
+float armLength, armAngle;
 
 // end of "global" varible declaration
 
@@ -81,6 +87,7 @@ void joyval_joystick2rv() { // reverse mode on right joystick
 }
 
 //discover the values for use in the driving routine (using above methods)
+
 void joyval_correct() {
   if ((normalctl) & (rev == 1)) {
     joyval_joystick1st();
@@ -164,6 +171,13 @@ void mainaccessory () {
    // add accesory stuff here
 }
 
+// motor manager takes in the target positon in inches of extremities
+// and converts those values into instructions for the motor, including the ramping of motors
+
+void motorManager () {
+
+}
+
 
 // BC - battery check
 void batterycheck () {
@@ -181,6 +195,8 @@ task main() {
     mainaccessory();
     batterycheck();
     //powercontrol();
+
+    motorManager();
 
   }
 }
