@@ -159,94 +159,9 @@ void powercontrol () {
 
 // accesory controler contols
 
-void ballpickup () {
-if (normalctl) {
-  if (abs(joystick.joy1_x2) > 50) {
-    motor[spinner] = joystick.joy1_x2 * -1;
-    } else {
-    motor[spinner] = 0;
-  }
-  } else {
-  if (abs(joystick.joy2_x1) > 50) {
-    motor[spinner] = joystick.joy2_y2;
-    } else {
-    motor[spinner] = 0;
-  }
-}
-}
-
-void gripbasket () {
-  if (normalctl) {
-    if (joy1Btn(4)) {
-      servo[grabspin] = 10;
-    } else if (joy1Btn(2)) {
-    servo[grabspin] = 128;
-  }
-  } else {
-	  if (joy1Btn(4)) {
-      servo[grabspin] = 10;
-    } else if (joy1Btn(2)) {
-    servo[grabspin] = 128;
-  }
-}
-}
-
-
-void armturn () {
-  if (normalctl) {
-    if (joy1Btn(8)) {
-
-      servo[leftrotate] = 0;
-      servo[rightrotate] = 255;
-      } else if (joy1Btn(7)) {
-
-
-
-      servo[leftrotate] = 255;
-      servo[rightrotate] = 0;
-      } else {
-      servo[leftrotate] = 128;
-      servo[rightrotate] = 128;
-    }
-    } else {
-    if (joy1Btn(8)) {
-      servoChangeRate[leftrotate] = 1;
-      servoChangeRate[rightrotate] = 1;
-      servo[leftrotate] = 108;
-      servo[rightrotate] = 148;
-      } else if (joy1Btn(7)) {
-      servoChangeRate[leftrotate] = 1;
-      servoChangeRate[rightrotate] = 1;
-      servo[leftrotate] = 148;
-      servo[rightrotate] = 108;
-      } else {
-      servo[leftrotate] = 128;
-      servo[rightrotate] = 128;
-    }
-  }
-}
-
-void armmovecheck () {
-  if (normalctl) {
-  if (abs(joystick.joy1_y2) > 40) {
-    motor[armmove] = joystick.joy1_y2 * -1;
-    } else {
-    motor[armmove] = 0;
-  }
-} else {
- if (abs(joystick.joy1_y1) > 20) {
-    motor[armmove] = joystick.joy1_y1;
-    } else {
-    motor[armmove] = 0;
-  }
-}
-}
 
 void mainaccessory () {
-  gripbasket();
-  gripbasket();
-  armturn();
-  ballpickup();
+   // add accesory stuff here
 }
 
 
@@ -263,7 +178,6 @@ task main() {
   while (isRunning) {
     getJoystickSettings(joystick);
     driving_joystick();
-    armmovecheck();
     mainaccessory();
     batterycheck();
     //powercontrol();
