@@ -183,7 +183,26 @@ int rotorSpeedCalc(float target, float current) {
 	if (target < current) { direction = -1; } else { direction = 1; }
 
 	if (abs(target-current) < rotorSlowRange) returnval = (abs(target-current) / 50) + 10;
-	rArmAngle = (abs(target-current) / 10000);
+
+	returnval = returnval * direction;
+
+	return returnval;
+}
+
+
+int angleSpeedCalc(float target, float current) {
+	if (rArmAngle == cArmAngle) return 0;
+	int rotorSlow = 20; // accuracy tuning for rotor
+	int rotorSlowRange = 500;
+	int rotorFast = 70; // max slewing speed
+
+	int returnval = rotorFast;
+
+	int direction;
+
+	if (rArmAngle < cArmAngle) { direction = -1; } else { direction = 1; }
+
+	if (abs(rArmAngle - cArmAngle) < rotorSlowRange) returnval = rotorSlow;
 
 	returnval = returnval * direction;
 
@@ -233,8 +252,8 @@ float ahsave1, ahsave2;
 void driveArmHeight(float joystickval) {
 
 	if (joy2Btn(9)) {
-		if (joy2Btn(1)) ahsave1 = cArmBaseRot;
-		if (joy2Btn(3)) ahsave2 = cArmBaseRot;
+		if (joy2Btn(1)) ahsave1 = cArmAngle;
+		if (joy2Btn(3)) ahsave2 = cArmAngle;
 	} else {
 		if (joy2Btn(1)) {
 			rArmAngle = ahsave1;
@@ -252,7 +271,7 @@ void driveArmHeight(float joystickval) {
 		driverslew = true;
 
 	} else if (abs(rArmAngle-cArmAngle) > rotorAcc) {
-		if (!driverslew) motor[ringLifterAngle] = rotorSpeedCalc(rArmAngle, cArmAngle);
+		if (!driverslew) motor[ringLifterAngle] = angleSpeedCalc(rArmAngle, cArmAngle);
 		// continue moving motors
 	} else {
 		motor[ringLifterAngle] = 0;
@@ -265,7 +284,7 @@ void driveArmHeight(float joystickval) {
 
 
 void mainaccessory () {
-	driverotator(leveljoystick(joystick.joy2_x1));
+	//driverotator(leveljoystick(joystick.joy2_x1));
 	driveArmHeight(joystick.joy2_y1);
 	//driveArmLength(joystick.joy2_y2);
 
