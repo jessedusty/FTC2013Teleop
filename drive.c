@@ -284,7 +284,7 @@ void driveArmHeight(float joystickval) {
 
 
 void mainaccessory () {
-	//driverotator(leveljoystick(joystick.joy2_x1));
+	driverotator(leveljoystick(joystick.joy2_x1));
 	driveArmHeight(joystick.joy2_y1);
 	//driveArmLength(joystick.joy2_y2);
 
