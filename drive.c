@@ -22,7 +22,7 @@ bool leftmode = true; //leftmode is when up/down is on left and left/right is on
 bool rightmode = false; // rightmode the reverse of leftmode
 bool isRunning = true; // specifies wether the robot is not in E-STOP mode - will stop all robot actions if set to false
 int quadrent = 0;
-
+bool driverslew = true;
 // values set throughout the program
 
 float leftstickval = 0;
@@ -187,14 +187,40 @@ int rotorSpeedCalc(float target, float current) {
 	return returnval;
 }
 
+float degtoenco (float deg) {
+	return deg * 40;
+}
+
+float leveljoystick (float joystickval) {
+	float returnval = joystickval * 0.78125;
+	return returnval;
+}
+float save1;
+float save2;
 void driverotator(float joystickval) {
 
+	if (joy2Btn(9)) {
+		if (joy2Btn(1)) save1 = cArmBaseRot;
+		if (joy2Btn(3)) save2 = cArmBaseRot;
+	} else {
+		if (joy2Btn(1)) {
+			rArmBaseRot = save1;
+			driverslew = false;
+		} else if (joy2Btn(3)) {
+			rArmBaseRot = save2;
+			driverslew = false;
+		}
+	}
+
+
 	if (abs(joystickval) > xThreshhold) {
-		armBaseRot = armBaseRot + (joystickval / -1000);
-		rArmBaseRot = armBaseRot * 40;
-		motor[armPivotor] = rotorSpeedCalc(rArmBaseRot, cArmBaseRot);
+
+		motor[armPivotor] = -1 * joystickval;
+		rArmBaseRot = cArmBaseRot;
+		driverslew = true;
+
 	} else if (abs(rArmBaseRot-cArmBaseRot) > rotorAcc) {
-		motor[armPivotor] = rotorSpeedCalc(rArmBaseRot, cArmBaseRot);
+		if (!driverslew) motor[armPivotor] = rotorSpeedCalc(rArmBaseRot, cArmBaseRot);
 		// continue moving motors
 	} else {
 		motor[armPivotor] = 0;
@@ -267,7 +293,7 @@ void driveArmLength(float joystickval) {
 
 
 void mainaccessory () {
-	driverotator(joystick.joy2_x1);
+	driverotator(leveljoystick(joystick.joy2_x1));
 	//driveArmHeight(joystick.joy2_y1);
 	//driveArmLength(joystick.joy2_y2);
 
