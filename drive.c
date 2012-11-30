@@ -285,12 +285,31 @@ void driveArmHeight(float joystickval) {
 }
 
 
+void endofarmservos() {
+	if (abs(joystick.joy2_x2) > xThreshhold) {
+		servo[roateGripper] = joystick.joy2_x2;
+	}
+	if (joy2Btn(7))
+	{
+		servo[whiteGripper] = 5;
+		} else if (joy2Btn(5)) {
+		servo[whiteGripper] = 123;
+	}
 
+	if (joy2Btn(8)) {
+		servo[orangeGripper] = 71;
+		} else if (joy2Btn(6)) {
+		servo[orangeGripper] = 256;
+	}
+
+}
 
 
 void mainaccessory () {
 	driverotator(leveljoystick(joystick.joy2_x1));
 	driveArmHeight(joystick.joy2_y1);
+
+	endofarmservos();
 	//driveArmLength(joystick.joy2_y2);
 
 	// add accesory stuff here
@@ -341,26 +360,7 @@ void GetNewEncoderVals() {
 	cGripperWrist = nMotorEncoder[gripperWrist];
 }
 
-void endofarmservos() {
-	if (abs(joystick.joy2_x2) > xThreshhold) {
-		gripperarmrotate = gripperarmrotate + ( joystick.joy2_x2 / 10);
-		if (gripperarmrotate < 1) { gripperarmrotate = 0; }
-		servo[roateGripper] = gripperarmrotate;
-	}
-	if (joy2Btn(7))
-	{
-		servo[whiteGripper] = 0;
-		} else if (joy2Btn(5)) {
-		servo[whiteGripper] = 128;
-	}
 
-	if (joy2Btn(8)) {
-		servo[orangeGripper] = 71;
-		} else if (joy2Btn(6)) {
-		servo[orangeGripper] = 256;
-	}
-
-}
 // TMT this is the main thread code
 task main() {
 	waitForStart();
@@ -375,7 +375,7 @@ task main() {
 		mainaccessory();
 		batterycheck();
 		//powercontrol();
-		endofarmservos();
+
 
 
 		motorManager();
