@@ -3,7 +3,7 @@
 #pragma config(Motor,  mtr_S1_C1_1,     ringLifterAngle, tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     ringLifterLength, tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C2_1,     armPivotor,    tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_2,     gripperWrist,  tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     gripperWrist,  tmotorTetrix, PIDControl)
 #pragma config(Motor,  mtr_S1_C3_1,     leftDrive,     tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C3_2,     rightDrive,    tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S1_C4_1,    servo1,               tServoNone)
@@ -304,12 +304,30 @@ void endofarmservos() {
 
 }
 
+void driveGripperWrist () {
+	if (joystick.joy2_TopHat == 0 ) {
+		motor[gripperWrist] = 30;
+	} else if (joystick.joy2_TopHat == 4) {
+		motor[gripperWrist] = -30;
+	} else {
+		motor[gripperWrist] = 0;
+}
+}
+
+void drivearmLenght() {
+	if (abs(joystick.joy2_y2) > yThreshhold) {
+			motor[ringLifterLength] = joystick.joy2_y2 * 0.78125;
+	}
+}
 
 void mainaccessory () {
 	driverotator(leveljoystick(joystick.joy2_x1));
 	driveArmHeight(joystick.joy2_y1);
 
 	endofarmservos();
+
+	driveGripperWrist();
+	drivearmLenght();
 	//driveArmLength(joystick.joy2_y2);
 
 	// add accesory stuff here
