@@ -231,6 +231,7 @@ void runLoopPause() {
 	while (time1[T1] < 50) {
 		wait1Msec(1);
 	}
+	time1[T1] = 0;
 }
 
 void GetNewEncoderVals() {
