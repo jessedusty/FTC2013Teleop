@@ -3,7 +3,7 @@
 #pragma config(Motor,  mtr_S1_C1_1,     ringLifterAngle, tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     ringLifterLength, tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C2_1,     armPivotor,    tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C2_2,     gripperWrist,  tmotorTetrix, PIDControl)
+#pragma config(Motor,  mtr_S1_C2_2,     gripperWrist,  tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_1,     leftDrive,     tmotorTetrix, openLoop, reversed)
 #pragma config(Motor,  mtr_S1_C3_2,     rightDrive,    tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S1_C4_1,    servo1,               tServoNone)
@@ -175,29 +175,56 @@ void powercontrol () {
 // accesory controler contols
 // edited by Oren the Awesome
 
-#define slowZone 500
+#define slowZone 1000
+#define holdingZone 300
+#define stopZone 200
 
-
-int wristPowerCalc(float target, float current)
+float withinval(float low, float high, float value) {
+	if (value < low) value = low;
+	if (value > high) value = high;
+	return value;
+}
+int motorPowerCalc(float target, float current)
 {
 	if (target == current) return 0;
-	int retval = 20; //maximum power
-	//if (abs(target - current) < slowZone) retval = (target - current) * 5/7;
-	if (abs(target - current) < slowZone) retval = 10;
-	if (target < current) retval = retval * -1;
+	if (abs(target-current) < stopZone) return 0;
+	int retval = 30; //maximum power
+	//if (abs(target - current) < slowZone) retval = 1/90 * (target - current);
+	if (abs(target - current) < slowZone) retval = 20;
+	if (abs(target - current) < holdingZone) retval = 10;
+	if (target > current) retval = retval * -1;
 
 	return retval;
 }
+void armAngleD() {
+	if (joy2Btn(4)) rArmAngle += 100;
+	if (joy2Btn(2)) rArmAngle -= 100;
+	if (abs(joystick.joy2_y1) > 10){
+		rArmAngle += joystick.joy2_y1;
+		}
+	rArmAngle = withinval(0, 4000, rArmAngle); // 9000
+	armAngle = -1 * motorPowerCalc(rArmAngle, cArmAngle);
+	motor[ringLifterAngle] = armAngle;
+}
+
 void grabberWrist()
 {
-	if (abs(joystick.joy2_y2) > 10) rGripperWrist += joystick.joy2_y2;
-	ggripperWrist = wristPowerCalc(rGripperWrist, cGripperWrist);
-	motor[gripperWrist] = -1 * ggripperWrist;
+	if (abs(joystick.joy2_y2) > 10){
+		rGripperWrist += joystick.joy2_y2;
+		} else {
+		//rGripperWrist = cGripperWrist;
+	}
+	rGripperWrist = withinval(0, 4000, rGripperWrist);
+	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist);
+	motor[gripperWrist] = ggripperWrist;
 
 }
+
+
 void accessoryControl()
 {
 	grabberWrist();
+	armAngleD();
 }
 
 // motor manager takes in the target positon in inches of extremities
