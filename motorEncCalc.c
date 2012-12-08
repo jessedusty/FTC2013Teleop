@@ -179,6 +179,28 @@ int yThreshhold = 15;
 int rotorAcc = 40; // clicks to not worry about accuracy
 
 int rotorSpeedCalc(float target, float current) {
+
+	if (target == current) return 0;
+	int rotorSlow = 20; // accuracy tuning for rotor
+	int rotorSlowRange = 500;
+	int rotorFast = 70; // max slewing speed
+
+	int returnval = rotorFast;
+
+	int direction;
+
+	if (target < current) { direction = -1; } else { direction = 1; }
+
+	if (abs(target-current) < rotorSlowRange) returnval = (abs(target-current) / 50) + 10;
+
+	returnval = returnval * direction;
+
+	return returnval;
+}
+
+int wristSpeedCalc(float target, float current) {
+	if (target < -3405) target = -3405;
+	if (target > 0) target = 0;
 	if (target == current) return 0;
 	int rotorSlow = 20; // accuracy tuning for rotor
 	int rotorSlowRange = 500;
@@ -198,8 +220,10 @@ int rotorSpeedCalc(float target, float current) {
 }
 
 
+int armLengthSpeedCalc(float target, float current) {
+	if (target > 4845) target = 4845;
+	if (target < 0) target = 0;
 
-int angleSpeedCalc(float target, float current) {
 	if (rArmAngle == cArmAngle) return 0;
 	int rotorSlow = 20; // accuracy tuning for rotor
 	int rotorSlowRange = 500;
@@ -211,7 +235,29 @@ int angleSpeedCalc(float target, float current) {
 
 	if (rArmAngle < cArmAngle) { direction = -1; } else { direction = 1; }
 
-	if (abs(rArmAngle - cArmAngle) < rotorSlowRange) returnval = rotorSlow;
+	if (abs(rArmAngle - cArmAngle) < rotorSlowRange) returnval = (abs(target-current) / 50) + 10;
+
+	returnval = returnval * direction;
+
+	return returnval;
+}
+
+int angleSpeedCalc(float target, float current) {
+	if (target > 8762) target = 8762;
+	if (target < 0) target = 0;
+
+	if (rArmAngle == cArmAngle) return 0;
+	int rotorSlow = 20; // accuracy tuning for rotor
+	int rotorSlowRange = 500;
+	int rotorFast = 70; // max slewing speed
+
+	int returnval = rotorFast;
+
+	int direction;
+
+	if (rArmAngle < cArmAngle) { direction = -1; } else { direction = 1; }
+
+	if (abs(rArmAngle - cArmAngle) < rotorSlowRange) returnval = (abs(target-current) / 50) + 10;
 
 	returnval = returnval * direction;
 
@@ -257,6 +303,7 @@ void driverotator(float joystickval) {
 
 	}
 }
+
 float ahsave1, ahsave2;
 void driveArmHeight(float joystickval) {
 
@@ -343,9 +390,10 @@ void driveGripperWrist () {
 
 void drivearmLenght() {
 	if (abs(joystick.joy2_y2) > yThreshhold) {
-		motor[ringLifterLength] = joystick.joy2_y2 * 0.78125;
+		 	rArmLength+= leveljoystick(joystick.joy2_y2);
+		 	motor[ringLifterLength] = armLengthSpeedCalc(rArmLength, cArmLength);
 		} else {
-		motor[ringLifterLength] = 0;
+		motor[ringLifterLength] = armLengthSpeedCalc(rArmLength, cArmLength);
 	}
 }
 
@@ -417,9 +465,9 @@ task main() {
 		getJoystickSettings(joystick);
 		GetNewEncoderVals();
 
-		driving_joystick();
-		mainaccessory();
-		batterycheck();
+		//driving_joystick();
+		//mainaccessory();
+		//batterycheck();
 		//powercontrol();
 
 		runLoopPause();
