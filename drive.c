@@ -173,7 +173,30 @@ void powercontrol () {
 }
 
 // accesory controler contols
+// edited by Oren the Awesome
 
+#define slowZone 500
+
+
+int wristPowerCalc(int target, int current)
+{
+	if (target == current) return 0;
+	int retval = 70; //maximum power
+	if (abs(target - current) < slowZone) retval = (target - current) * 5/7;
+	if (target > current) retval *= -1;
+
+	return retval;
+}
+void grabberWrist()
+{
+	if (abs(joystick.joy2_y2) > 10) rGripperWrist += joystick.joy2_y2 / 50;
+	motor[gripperWrist] = wristPowerCalc(rGripperWrist, cGripperWrist);
+
+}
+void accessoryControl()
+{
+	grabberWrist();
+}
 
 // motor manager takes in the target positon in inches of extremities
 // and converts those values into instructions for the motor, including the ramping of motors
@@ -229,7 +252,7 @@ task main() {
 		GetNewEncoderVals();
 
 		driving_joystick();
-		mainaccessory();
+		accessoryControl();
 		batterycheck();
 
 
