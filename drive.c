@@ -178,19 +178,21 @@ void powercontrol () {
 #define slowZone 500
 
 
-int wristPowerCalc(int target, int current)
+int wristPowerCalc(float target, float current)
 {
 	if (target == current) return 0;
-	int retval = 70; //maximum power
-	if (abs(target - current) < slowZone) retval = (target - current) * 5/7;
-	if (target > current) retval *= -1;
+	int retval = 20; //maximum power
+	//if (abs(target - current) < slowZone) retval = (target - current) * 5/7;
+	if (abs(target - current) < slowZone) retval = 10;
+	if (target < current) retval = retval * -1;
 
 	return retval;
 }
 void grabberWrist()
 {
-	if (abs(joystick.joy2_y2) > 10) rGripperWrist += joystick.joy2_y2 / 50;
-	motor[gripperWrist] = wristPowerCalc(rGripperWrist, cGripperWrist);
+	if (abs(joystick.joy2_y2) > 10) rGripperWrist += joystick.joy2_y2;
+	ggripperWrist = wristPowerCalc(rGripperWrist, cGripperWrist);
+	motor[gripperWrist] = -1 * ggripperWrist;
 
 }
 void accessoryControl()
