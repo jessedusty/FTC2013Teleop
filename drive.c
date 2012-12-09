@@ -260,55 +260,70 @@ void endOfArmServos()
 }
 
 void doneMovingTo () {
- if (abs(rGripperWrist - cGripperWrist) > 50) { doneMoving.wristAngle = true; } else { doneMoving.wristAngle = true; }
- if (abs(rArmAngle - cArmAngle) > 50) { doneMoving.armAngle = true; } else { doneMoving.armAngle = false; }
- if (abs(rArmLength - cArmLength) > 50) { doneMoving.armLength = true;} else {doneMoving.armLength = false;}
- if (abs(rArmBaseRot - cArmBaseRot) > 50) { doneMoving.armBaseRot = true; } else { doneMoving.armBaseRot = false; }
- if (abs(gripperarmrotate - servo[rotateGripper]) > 50) { doneMoving.wristRotate = true; } else { doneMoving.wristRotate = false; }
+	///if (abs(rGripperWrist - cGripperWrist) > 100) { doneMoving.wristAngle = true; } else { doneMoving.wristAngle = true; }
+	///if (abs(rArmAngle - cArmAngle) > 100) { doneMoving.armAngle = true; } else { doneMoving.armAngle = false; }
+	///if (abs(rArmLength - cArmLength) > 100) { doneMoving.armLength = true;} else {doneMoving.armLength = false;}
+	///if (abs(rArmBaseRot - cArmBaseRot) > 100) { doneMoving.armBaseRot = true; } else { doneMoving.armBaseRot = false; }
+	///if (abs(gripperarmrotate - servo[rotateGripper]) > 50) { doneMoving.wristRotate = true; } else { doneMoving.wristRotate = false; }
+	doneMoving.wristAngle = true;
+	doneMoving.armAngle = true;
+	doneMoving.armLength = true;
+	doneMoving.armBaseRot = true;
+	doneMoving.wristRotate = true;
 }
 
 void updatecurrentstage() {
-if ((currentstage == -1) & doneMoving.armLength & (rArmLength == 0)) currentstage = 0;
-if ((currentstage == 0) & doneMoving.armAngle) currentstage = 1;
-if ((currentstage == 1) & doneMoving.armBaseRot) currentstage = 2;
-if ((currentstage == 2) & doneMoving.armAngle) currentstage = 3;
-if ((currentstage == 3) & doneMoving.wristAngle) currentstage = 4;
-if ((currentstage == 4) & doneMoving.wristRotate) currentstage = 5;
-if ((currentstage == 5) & doneMoving.armLength) currentstage = 6;
+	currentstage++;
+	//if (currentstage == -1) { rArmLength = 0; currentstage = 0;}
+	//if ((currentstage == 0) & doneMoving.armAngle) currentstage = 1;
+	//if ((currentstage == 1) & doneMoving.armBaseRot) currentstage = 2;
+	//if ((currentstage == 2) & doneMoving.armAngle) currentstage = 3;
+	//if ((currentstage == 3) & doneMoving.wristAngle) currentstage = 4;
+	//if ((currentstage == 4) & doneMoving.wristRotate) currentstage = 5;
+	//if ((currentstage == 5) & doneMoving.armLength) currentstage = 6;
 }
 
 void gotoposition (int position, int type) {
 	if (currentstage != -2) {
 
-		if (type == 1) {
+		if (true) {
 			robotuxPosition &s = savedPositions[position];
-			doneMovingTo();
-			switch(currentstage) {
-			case -1: rArmLength = 0; break;
-			case 0:	rArmAngle = (rArmAngle > 2000) ? rArmAngle : 2000; break;
-			case 1:	rArmBaseRot = s.armBaseRot;	break;
-			case 2:	rArmAngle = s.armAngle; break;
-			case 3:	rGripperWrist = s.wristAngle;	break;
-			case 4:	gripperarmrotate = s.wristRotate;	break;
-			case 5:	rArmLength = s.armLength; break;
-			default: currentstage = -2; break;
-			}
-			} else {
-			robotuxPosition &p = preSavedPositions[position];
-			switch(currentstage) {
-			case -1: rArmLength = 0; break;
-			case 0:	rArmAngle = (rArmAngle > 2000) ? rArmAngle : 2000; break;
-			case 1:	rArmBaseRot = p.armBaseRot;	break;
-			case 2:	rArmAngle = p.armAngle; break;
-			case 3:	rGripperWrist = p.wristAngle;	break;
-			case 4:	gripperarmrotate = p.wristRotate;	break;
-			case 5:	rArmLength = p.armLength; break;
-			default: currentstage = -2; break;
-			}
-		}
+			//doneMovingTo();
 
+			// rArmLength = 0;
+
+			rArmBaseRot = s.armBaseRot;
+			rArmAngle = s.armAngle;
+			rGripperWrist = s.wristAngle;
+			gripperarmrotate = s.wristRotate;
+			rArmLength = s.armLength;
+			currentstage = -2;
+		}
+		} else {
+		robotuxPosition &p = preSavedPositions[position];
+		rArmBaseRot = p.armBaseRot;
+		rArmAngle = p.armAngle;
+		rGripperWrist = p.wristAngle;
+		gripperarmrotate = p.wristRotate;
+		rArmLength = p.armLength;
+		currentstage = -2;
 	}
+
+
+
 }
+
+void setuppermspots () {
+
+//	preSavedPositions[3].armBaseRot = 428;
+
+	//'preSavedPositions[1].
+
+	savedPositions[3].armBaseRot = 2111;
+	savedPositions[3].wristAngle = -340;
+	savedPositions[3].wristRotate = 133;
+}
+
 
 void savePos (int position) {
 	savedPositions[position].armLength = rArmLength;
@@ -321,6 +336,7 @@ void savePos (int position) {
 
 int lastposition;
 void positionSaving () {
+	setuppermspots();
 	if (currentstage == -2) lastposition = 0;
 	if (joy2Btn(1) & !joy2Btn(9) & !joy2Btn(10)) { lastposition = 1; currentstage = -1; }
 	if (joy2Btn(2) & !joy2Btn(9) & !joy2Btn(10)) { lastposition = 2; currentstage = -1; }
@@ -329,7 +345,7 @@ void positionSaving () {
 
 	if (joy2Btn(1) & joy2Btn(9)) savePos(1);
 	if (joy2Btn(2) & joy2Btn(9)) savePos(2);
-	if (joy2Btn(3) & joy2Btn(9)) savePos(3);
+	//if (joy2Btn(3) & joy2Btn(9)) savePos(3);
 	if (joy2Btn(4) & joy2Btn(9)) savePos(4);
 
 	if (joy2Btn(1) & joy2Btn(10)) lastposition = -1;
