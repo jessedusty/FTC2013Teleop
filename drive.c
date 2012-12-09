@@ -1,5 +1,4 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Motor,  mtr_S1_C1_1,     ringLifterAngle, tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     ringLifterLength, tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C2_1,     armPivotor,    tmotorTetrix, openLoop)
@@ -130,6 +129,7 @@ void movethemotors() {
 
 //DJ - where the main driving happens (it calls the other stuff above)
 void driving_joystick() {
+	if (joy1Btn(9)) { while (joy1Btn(9)) {PlayTone(4000, 1);} rev *= -1;}
 	joyval_correct(); //put the correct joystick values in their varibles
 	if (leftstickval > 0.0) {
 		if (rightstickval > 0.0) {
@@ -227,23 +227,24 @@ void armAngleD() {
 void grabberWrist()
 {
 	if (abs(joystick.joy2_y2) > 10) { rGripperWrist += joystick.joy2_y2; currentstage = -2;}
-	rGripperWrist = withinval(0, 4000, rGripperWrist);
-	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 50, 10, 20, 30);
+	rGripperWrist = withinval(-3000, 0, rGripperWrist);
+	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 50, 10, 40, 60);
 	motor[gripperWrist] = ggripperWrist;
 }
-
+float otherval;
 void armLengthD()
 {
 	if (joystick.joy2_TopHat == 0) { rArmLength += 80; currentstage = -2;}
 	if (joystick.joy2_TopHat == 4) { rArmLength -= 80; currentstage = -2;}
 
 	rArmLength = withinval(0, 4000, rArmLength);
-	motor[ringLifterLength] = -1 * motorPowerCalc(rArmLength, cArmLength, 50, 10, 20, 30);
+	otherval = -1 * motorPowerCalc(rArmLength, cArmLength, 50, 10, 40, 60);
+	motor[ringLifterLength] = otherval;
 }
 
 void armRotateD()
 {
-	if (abs(joystick.joy2_x1) > 10) {rArmBaseRot += joystick.joy2_x1; currentstage = -2;}
+	if (abs(joystick.joy2_x1) > 10) {rArmBaseRot -= joystick.joy2_x1; currentstage = -2;}
 	//rArmBaseRot = withinval(0, 4000, rArmBaseRot);
 	motor[armPivotor] = -1 * motorPowerCalc(rArmBaseRot, cArmBaseRot, 50, 10, 30, 60);
 }
@@ -251,10 +252,10 @@ void armRotateD()
 void endOfArmServos()
 {
 	if(joy2Btn(5)) servo[whiteGripper] = 123;
-	if(joy2Btn(6)) servo[orangeGripper] = 123;
+	if(joy2Btn(6)) servo[orangeGripper] = 256;
 	if(joy2Btn(7)) servo[whiteGripper] = 5;
-	if(joy2Btn(8)) servo[orangeGripper] = 5;
-	if(abs(joystick.joy2_x2) > 10) { gripperarmrotate += joystick.joy2_x2; currentstage = -2;}
+	if(joy2Btn(8)) servo[orangeGripper] = 71;
+	if(abs(joystick.joy2_x2) > 10) { gripperarmrotate += joystick.joy2_x2 / 15; currentstage = -2;}
 	servo[rotateGripper] = gripperarmrotate;
 }
 
@@ -309,7 +310,13 @@ void gotoposition (int position, int type) {
 	}
 }
 
-void savePos (int position) {}
+void savePos (int position) {
+	savedPositions[position].armLength = rArmLength;
+	savedPositions[position].armAngle = rArmAngle;
+	savedPositions[position].armBaseRot = rArmBaseRot;
+	savedPositions[position].wristAngle = rGripperWrist;
+	savedPositions[position].wristRotate = gripperarmrotate;
+}
 
 
 int lastposition;
@@ -386,6 +393,7 @@ void GetNewEncoderVals() {
 	cArmLength = nMotorEncoder[ringLifterLength];
 	cArmAngle = nMotorEncoder[ringLifterAngle];
 	cGripperWrist = nMotorEncoder[gripperWrist];
+	//cGripperWrist *= -1;
 }
 
 
@@ -402,7 +410,7 @@ task main() {
 		driving_joystick();
 		accessoryControl();
 		batterycheck();
-
+		positionSaving();
 
 		//powercontrol();
 
