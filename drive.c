@@ -175,7 +175,7 @@ void powercontrol () {
 // accesory controler contols
 // edited by Oren the Awesome
 
-struct {
+typedef struct {
 	float armAngle;
 	float armLength;
 	float armBaseRot;
@@ -193,6 +193,7 @@ typedef struct {
 
 movingDone doneMoving;
 robotuxPosition savedPositions[3];
+robotuxPosition preSavedPositions[3];
 
 float withinval(float low, float high, float value) {
 	if (value < low) value = low;
@@ -214,11 +215,9 @@ int motorPowerCalc(float target, float current, int stopZone, int holdSpeed, int
 
 	return retval;
 }
-//bool reachedArmAngle;
 void armAngleD() {
-	//if (rArmAngle
-	if (joy2Btn(4)) rArmAngle += 100;
-	if (joy2Btn(2)) rArmAngle -= 100;
+	//if (joy2Btn(4)) rArmAngle += 100;
+	//if (joy2Btn(2)) rArmAngle -= 100;
 	if (abs(joystick.joy2_y1) > 10){ rArmAngle += joystick.joy2_y1; currentstage = -2;}
 	rArmAngle = withinval(0, 4000, rArmAngle); // 9000
 	armAngle = -1 * motorPowerCalc(rArmAngle, cArmAngle, 50, 10, 40, 60);
@@ -267,7 +266,6 @@ doneMoving.armBaseRot = (abs(rArmBaseRot - cArmBaseRot) > 50) ? true : false;
 doneMoving.wristRotate = (abs(gripperarmrotate - servo[rotateGripper]) > 50) ? true : false;
 }
 
-
 void updatecurrentstage() {
 currentstage = ((currentstage == -1) & doneMoving.armLength & (rArmLength == 0)) ? 0 : currentstage;
 currentstage = ((currentstage == 0) & doneMoving.armAngle) ? 1 : currentstage;
@@ -280,24 +278,62 @@ currentstage = ((currentstage == 5) & doneMoving.armLength) ? 6 : currentstage;
 
 void gotoposition (int position, int type) {
 	if (currentstage != -2) {
-		if (type == 1) robotuxPosition &p = savedPositions[position];
-		doneMovingTo();
-		switch(currentstage) {
-		case -1: rArmLength = 0; break;
-		case 0:	rArmAngle = (rArmAngle > 2000) ? rArmAngle : 2000; break;
-		case 1:	rArmBaseRot = p.armBaseRot;	break;
-		case 2:	rArmAngle = p.armAngle; break;
-		case 3:	rGripperWrist = p.wristAngle;	break;
-		case 4:	gripperarmrotate = p.wristRotate;	break;
-		case 5:	rArmLength = p.armLength; break;
-		default: currentstage = -2; break;
+
+		if (type == 1) {
+			robotuxPosition &s = savedPositions[position];
+			doneMovingTo();
+			switch(currentstage) {
+			case -1: rArmLength = 0; break;
+			case 0:	rArmAngle = (rArmAngle > 2000) ? rArmAngle : 2000; break;
+			case 1:	rArmBaseRot = s.armBaseRot;	break;
+			case 2:	rArmAngle = s.armAngle; break;
+			case 3:	rGripperWrist = s.wristAngle;	break;
+			case 4:	gripperarmrotate = s.wristRotate;	break;
+			case 5:	rArmLength = s.armLength; break;
+			default: currentstage = -2; break;
+			}
+			} else {
+			robotuxPosition &p = preSavedPositions[position];
+			switch(currentstage) {
+			case -1: rArmLength = 0; break;
+			case 0:	rArmAngle = (rArmAngle > 2000) ? rArmAngle : 2000; break;
+			case 1:	rArmBaseRot = p.armBaseRot;	break;
+			case 2:	rArmAngle = p.armAngle; break;
+			case 3:	rGripperWrist = p.wristAngle;	break;
+			case 4:	gripperarmrotate = p.wristRotate;	break;
+			case 5:	rArmLength = p.armLength; break;
+			default: currentstage = -2; break;
+			}
 		}
 
 	}
 }
 
-void positionSaving () {
+void savePos (int position) {}
 
+
+int lastposition;
+void positionSaving () {
+	if (currentstage == -2) lastposition = 0;
+	if (joy2Btn(1) & !joy2Btn(9) & !joy2Btn(10)) lastposition = 1;
+	if (joy2Btn(2) & !joy2Btn(9) & !joy2Btn(10)) lastposition = 2;
+	if (joy2Btn(3) & !joy2Btn(9) & !joy2Btn(10)) lastposition = 3;
+	if (joy2Btn(4) & !joy2Btn(9) & !joy2Btn(10)) lastposition = 4;
+
+	if (joy2Btn(1) & joy2Btn(9)) savePos(1);
+	if (joy2Btn(2) & joy2Btn(9)) savePos(2);
+	if (joy2Btn(3) & joy2Btn(9)) savePos(3);
+	if (joy2Btn(4) & joy2Btn(9)) savePos(4);
+
+	if (joy2Btn(1) & joy2Btn(10)) lastposition = -1;
+	if (joy2Btn(2) & joy2Btn(10)) lastposition = -2;
+	if (joy2Btn(3) & joy2Btn(10)) lastposition = -3;
+	if (joy2Btn(4) & joy2Btn(10)) lastposition = -4;
+
+
+
+	if (lastposition > 0) gotoposition(lastposition, 1);
+	if (lastposition < 0) gotoposition(abs(lastposition), 2);
 }
 
 void accessoryControl()
