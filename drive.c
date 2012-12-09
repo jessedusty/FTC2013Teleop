@@ -175,23 +175,22 @@ void powercontrol () {
 // accesory controler contols
 // edited by Oren the Awesome
 
-#define slowZone 1000
-#define holdingZone 300
-#define stopZone 200
-
 float withinval(float low, float high, float value) {
 	if (value < low) value = low;
 	if (value > high) value = high;
 	return value;
 }
-int motorPowerCalc(float target, float current)
+
+int motorPowerCalc(float target, float current, int stopZone, int holdSpeed, int slowSpeed, int fastSpeed)
 {
+	int slowZone = 1000;
+	int holdingZone = stopZone * 4;
 	if (target == current) return 0;
 	if (abs(target-current) < stopZone) return 0;
-	int retval = 30; //maximum power
+	int retval = fastSpeed; //maximum power
 	//if (abs(target - current) < slowZone) retval = 1/90 * (target - current);
-	if (abs(target - current) < slowZone) retval = 20;
-	if (abs(target - current) < holdingZone) retval = 10;
+	if (abs(target - current) < slowZone) retval = slowSpeed;
+	if (abs(target - current) < holdingZone) retval = holdSpeed;
 	if (target > current) retval = retval * -1;
 
 	return retval;
@@ -201,30 +200,52 @@ void armAngleD() {
 	if (joy2Btn(2)) rArmAngle -= 100;
 	if (abs(joystick.joy2_y1) > 10){
 		rArmAngle += joystick.joy2_y1;
-		}
+	}
 	rArmAngle = withinval(0, 4000, rArmAngle); // 9000
-	armAngle = -1 * motorPowerCalc(rArmAngle, cArmAngle);
+	armAngle = -1 * motorPowerCalc(rArmAngle, cArmAngle, 50, 10, 40, 60);
 	motor[ringLifterAngle] = armAngle;
 }
 
 void grabberWrist()
 {
-	if (abs(joystick.joy2_y2) > 10){
-		rGripperWrist += joystick.joy2_y2;
-		} else {
-		//rGripperWrist = cGripperWrist;
-	}
+	if (abs(joystick.joy2_y2) > 10) rGripperWrist += joystick.joy2_y2;
 	rGripperWrist = withinval(0, 4000, rGripperWrist);
-	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist);
+	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 50, 10, 20, 30);
 	motor[gripperWrist] = ggripperWrist;
-
 }
 
+void armLengthD()
+{
+	if (joystick.joy2_TopHat == 0) rArmLength += 80;
+	if (joystick.joy2_TopHat == 4) rArmLength -= 80;
 
+	rArmLength = withinval(0, 4000, rArmLength);
+	motor[ringLifterLength] = -1 * motorPowerCalc(rArmLength, cArmLength, 50, 10, 20, 30);
+}
+
+void armRotateD()
+{
+	if (abs(joystick.joy2_x1) > 10) rArmBaseRot += joystick.joy2_x1;
+	//rArmBaseRot = withinval(0, 4000, rArmBaseRot);
+	motor[armPivotor] = -1 * motorPowerCalc(rArmBaseRot, cArmBaseRot, 50, 10, 30, 60);
+}
+
+void endOfArmServos()
+{
+	if(joy2Btn(5)) servo[whiteGripper] = 123;
+	if(joy2Btn(6)) servo[orangeGripper] = 123;
+	if(joy2Btn(7)) servo[whiteGripper] = 5;
+	if(joy2Btn(8)) servo[orangeGripper] = 5;
+	if(abs(joystick.joy2_x2) > 10) gripperarmrotate += joystick.joy2_x2;
+	servo[rotateGripper] = gripperarmrotate;
+}
 void accessoryControl()
 {
 	grabberWrist();
 	armAngleD();
+	armLengthD();
+	armRotateD();
+	endOfArmServos();
 }
 
 // motor manager takes in the target positon in inches of extremities
