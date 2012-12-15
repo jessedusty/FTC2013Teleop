@@ -191,17 +191,6 @@ typedef struct {
 	bool wristRotate;
 } movingDone;
 
-typedef struct {
-	float r;
-	float actR;
-	float theta;
-	float actTheta;
-	float oHeight;
-	float height;
-	float length;
-} XYVar;
-
-XYVar XYVars;
 movingDone doneMoving;
 robotuxPosition savedPositions[5];
 robotuxPosition preSavedPositions[5];
@@ -232,8 +221,8 @@ float calculateArmAngle(float degrees) {
 void armAngleD() {
 	//if (joy2Btn(4)) rArmAngle += 100;
 	//if (joy2Btn(2)) rArmAngle -= 100;
-	//if (abs(joystick.joy2_y1) > 10){ rArmAngle += joystick.joy2_y1; currentstage = -2;}
-	rArmAngle = withinval(0, calculateArmAngle(120), rArmAngle); // 90
+	if (abs(joystick.joy2_y1) > 10){ rArmAngle += joystick.joy2_y1; currentstage = -2;}
+	rArmAngle = withinval(0, calculateArmAngle(90), rArmAngle); // 9000
 	armAngle = -1 * motorPowerCalc(rArmAngle, cArmAngle, 50, 10, 50, 70);
 	motor[ringLifterAngle] = armAngle;
 }
@@ -251,8 +240,8 @@ void grabberWrist()
 float otherval;
 void armLengthD()
 {
-	//if (joystick.joy2_TopHat == 0) { rArmLength += 80; currentstage = -2;}
-	//if (joystick.joy2_TopHat == 4) { rArmLength -= 80; currentstage = -2;}
+	if (joystick.joy2_TopHat == 0) { rArmLength += 80; currentstage = -2;}
+	if (joystick.joy2_TopHat == 4) { rArmLength -= 80; currentstage = -2;}
 
 	rArmLength = withinval(0, 4000, rArmLength);
 	otherval = -1 * motorPowerCalc(rArmLength, cArmLength, 50, 10, 40, 60);
@@ -272,37 +261,8 @@ void endOfArmServos()
 	if(joy2Btn(6)) servo[orangeGripper] = 256;
 	if(joy2Btn(7)) servo[whiteGripper] = 5;
 	if(joy2Btn(8)) servo[orangeGripper] = 71;
-	///if(abs(joystick.joy2_x2) > 10) { gripperarmrotate += joystick.joy2_x2 / 15; currentstage = -2;}
+	if(abs(joystick.joy2_x2) > 10) { gripperarmrotate += joystick.joy2_x2 / 15; currentstage = -2;}
 	servo[rotateGripper] = gripperarmrotate;
-}
-
-void accesoryArmDriver () {
-	if (abs(joystick.joy2_y2) > 10) { XYVars.length += joystick.joy2_y2 / 100; currentstage = -2;}
-	if (abs(joystick.joy2_y1) > 10) { XYVars.height += joystick.joy2_y1 / 100; currentstage = -2;}
-	XYVars.height = withinval(0, 48, XYVars.height);
-	XYVars.length = withinval(0, 35, XYVars.length);
-
-	// offset 16 inches
-
-
-	XYVars.oHeight = XYVars.height - 16;
-	if (XYVars.oHeight > 0) {
-		XYVars.theta = radiansToDegrees(atan(XYVars.oHeight / XYVars.length));
-		XYVars.r = sqrt(pow(XYVars.oHeight, 2) + pow(XYVars.length, 2));
-		XYVars.actTheta = calculateArmAngle(XYVars.theta);
-		XYVars.actR = ((XYVars.r - 22) / 3.8) * 1440; /// .2375
-		rArmAngle = XYVars.actTheta;
-		rArmLength = XYVars.actR;
-	} else {
-		XYVars.oHeight = abs(XYVars.oHeight);
-		XYVars.theta = radiansToDegrees(atan(XYVars.oHeight / XYVars.length));
-		XYVars.r = sqrt(pow(XYVars.oHeight, 2) + pow(XYVars.length, 2));
-		XYVars.actTheta = -1 * calculateArmAngle(XYVars.theta);
-		XYVars.actR = ((XYVars.r - 22) / 3.8) * 1440; /// .2375
-		rArmAngle = XYVars.actTheta;
-		rArmLength = XYVars.actR;
-}
-
 }
 
 void doneMovingTo () {
@@ -409,7 +369,6 @@ void accessoryControl()
 {
 	positionSaving();
 
-	accesoryArmDriver();
 	grabberWrist();
 	armAngleD();
 	armLengthD();
@@ -437,8 +396,6 @@ void resetencodersandvals () {
 	cArmAngle = 0;
 	cArmBaseRot = 0;
 	cGripperWrist = 0;
-
-	XYVars.length = 18;
 
 	nMotorEncoder[leftDrive] = 0;
 	nMotorEncoder[rightDrive] = 0;
