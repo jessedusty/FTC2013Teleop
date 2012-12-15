@@ -237,7 +237,7 @@ void grabberWrist()
 
 	rGripperWrist = calculateGripperAngle(cArmAngle) + offset;
 	rGripperWrist = withinval(-3000, 0, rGripperWrist);
-	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 20, 10, 20, 50);
+	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 20, 10, 25, 70);
 	motor[gripperWrist] = ggripperWrist;
 }
 float otherval;
@@ -296,7 +296,7 @@ void updatecurrentstage() {
 void gotoposition (int position, int type) {
 	if (currentstage != -2) {
 
-		if (true) {
+		if (type == 1) {
 			robotuxPosition &s = savedPositions[position];
 			//doneMovingTo();
 
@@ -309,7 +309,7 @@ void gotoposition (int position, int type) {
 			rArmLength = s.armLength;
 			currentstage = -2;
 		}
-		} else {
+		} else if (type == 2) {
 		robotuxPosition &p = preSavedPositions[position];
 		rArmBaseRot = p.armBaseRot;
 		rArmAngle = p.armAngle;
@@ -330,8 +330,21 @@ void setuppermspots () {
 	//'preSavedPositions[1].
 
 	savedPositions[3].armBaseRot = 2111;
-	savedPositions[3].wristAngle = -340;
+	//savedPositions[3].wristAngle = -340;
 	savedPositions[3].wristRotate = 133;
+
+	preSavedPositions[1].armBaseRot = 2111;
+	preSavedPositions[1].armAngle = 0;
+	preSavedPositions[1].wristRotate = 133;
+
+	preSavedPositions[2].armBaseRot = 2111;
+	preSavedPositions[2].armAngle = 1839;
+	preSavedPositions[2].wristRotate = 133;
+
+	preSavedPositions[3].armBaseRot = 2111;
+	preSavedPositions[3].armAngle = 3382;
+	preSavedPositions[3].wristRotate = 133;
+
 }
 
 
@@ -356,7 +369,7 @@ void positionSaving () {
 	if (joy2Btn(1) & joy2Btn(9)) savePos(1);
 	if (joy2Btn(2) & joy2Btn(9)) savePos(2);
 	//if (joy2Btn(3) & joy2Btn(9)) savePos(3);
-	if (joy2Btn(4) & joy2Btn(9)) savePos(4);
+	//if (joy2Btn(4) & joy2Btn(9)) savePos(4);
 
 	if (joy2Btn(1) & joy2Btn(10)) lastposition = -1;
 	if (joy2Btn(2) & joy2Btn(10)) lastposition = -2;
