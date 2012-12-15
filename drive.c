@@ -211,7 +211,7 @@ int motorPowerCalc(float target, float current, int stopZone, int holdSpeed, int
 	//if (abs(target - current) < slowZone) retval = 1/90 * (target - current);
 	if (abs(target - current) < slowZone) retval = slowSpeed;
 	if (abs(target - current) < holdingZone) retval = holdSpeed;
-	if (target > current) retval = retval * -1;
+	if (target > current) retval *= -1;
 
 	return retval;
 }
