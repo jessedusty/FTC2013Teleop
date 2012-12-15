@@ -226,26 +226,20 @@ int motorPowerCalc(float target, float current, int stopZone, int holdSpeed, int
 
 	return retval;
 }
-float calculateArmAngle(float degrees) {
-	return ((degrees + 32) * 9 * 1440 / 360) ; //122 max deg
-}
 void armAngleD() {
 	//if (joy2Btn(4)) rArmAngle += 100;
 	//if (joy2Btn(2)) rArmAngle -= 100;
-	//if (abs(joystick.joy2_y1) > 10){ rArmAngle += joystick.joy2_y1; currentstage = -2;}
-	rArmAngle = withinval(0, calculateArmAngle(120), rArmAngle); // 90
+	if (abs(joystick.joy2_y1) > 10){ rArmAngle += joystick.joy2_y1; currentstage = -2;}
+	rArmAngle = withinval(0, 4000, rArmAngle); // 9000
 	armAngle = -1 * motorPowerCalc(rArmAngle, cArmAngle, 50, 10, 50, 70);
 	motor[ringLifterAngle] = armAngle;
 }
-float calculateGripperAngle(float degrees) {
-	return ((-0.343889682708415 * degrees) - 404) ; //128 deg for in line with Arm
-}
+
 void grabberWrist()
 {
-	///if (abs(joystick.joy2_y2) > 10) { rGripperWrist += joystick.joy2_y2; currentstage = -2;}
-	rGripperWrist = calculateGripperAngle(cArmAngle);
+	if (abs(joystick.joy2_y2) > 10) { rGripperWrist += joystick.joy2_y2; currentstage = -2;}
 	rGripperWrist = withinval(-3000, 0, rGripperWrist);
-	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 20, 10, 20, 50);
+	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 50, 10, 40, 60);
 	motor[gripperWrist] = ggripperWrist;
 }
 float otherval;
