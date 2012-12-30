@@ -234,7 +234,6 @@ void grabberWrist()
 	///if (abs(joystick.joy2_y2) > 10) { rGripperWrist += joystick.joy2_y2; currentstage = -2;}
 	int offset = 0;
 	if (joystick.joy2_y2 > 50) { offset = 400; } else if (joystick.joy2_y2 < -50) { offset = -400; }
-
 	rGripperWrist = calculateGripperAngle(cArmAngle) + offset;
 	rGripperWrist = withinval(-3000, 0, rGripperWrist);
 	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 20, 10, 25, 70);
@@ -459,3 +458,22 @@ task main() {
 
 	}
 }
+
+// (0(0)
+// (^.^)
+// (: :)
+// ("(")  MR. Bunny is Happy
+void bunny()
+{
+  if (carrotGiven()){bunny.mood=happy;}
+}
+
+
+void Bunny2 ()
+{
+	if (joy2Btn(4)) motor[BunnyLeftFoot] = 25;
+}
+
+
+{
+	if (joy2Btn(12))
