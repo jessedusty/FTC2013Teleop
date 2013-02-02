@@ -457,7 +457,7 @@ void GetNewEncoderVals() {
 
 // TMT this is the main thread code
 task main() {
-	waitForStart();
+	//waitForStart();
 	isRunning = true; // sets isRunning to true, just in case it gets set to false
 	time1[T1] = 0;
 	resetencodersandvals();
@@ -469,6 +469,18 @@ task main() {
 		//mainaccessory();
 		//batterycheck();
 		//powercontrol();
+
+		switch (nNxtButtonPressed) {
+		case 1:
+			motor[armPivotor] = 20;
+			break;
+		case 2:
+			motor[armPivotor] = -20;
+			break;
+		default:
+			motor[armPivotor] = 0;
+			break;
+		}
 
 		runLoopPause();
 
