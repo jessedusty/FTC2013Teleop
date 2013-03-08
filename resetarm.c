@@ -25,8 +25,13 @@ while (true) {
 		case 2:
 			motor[armPivotor] = -20;
 			break;
+		case 3:
+			motor[ringLifterAngle] = -10;
+			motor[gripperWrist] = -10;
 		default:
 			motor[armPivotor] = 0;
+			motor[ringLifterAngle] = 0;
+			motor[gripperWrist] = 0;
 			break;
 		}
 }
