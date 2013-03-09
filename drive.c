@@ -247,7 +247,7 @@ void armLengthD()
 	if (joystick.joy2_TopHat == 0) { rArmLength += 80; currentstage = -2;}
 	if (joystick.joy2_TopHat == 4) { rArmLength -= 80; currentstage = -2;}
 
-	rArmLength = withinval(0, 4000, rArmLength);
+	rArmLength = withinval(0, 6000, rArmLength);
 	otherval = -1 * motorPowerCalc(rArmLength, cArmLength, 50, 10, 40, 60);
 	motor[ringLifterLength] = otherval;
 }
