@@ -256,7 +256,7 @@ void armLengthD()
 
 void armRotateD()
 {
-	if (abs(joystick.joy2_x1) > 10) {rArmBaseRot -= joystick.joy2_x1; currentstage = -2;}
+	if (abs(joystick.joy1_x1) > 10) {rArmBaseRot -= joystick.joy1_x1; currentstage = -2;}
 	//rArmBaseRot = withinval(0, 4000, rArmBaseRot);
 	motor[armPivotor] = -1 * motorPowerCalc(rArmBaseRot, cArmBaseRot, 50, 10, 50, 80);
 }
@@ -461,7 +461,7 @@ task main() {
 		GetNewEncoderVals();
 
 		if (joy1Btn(2)) {
-			PlayImmediateTone(4000, 1);
+			if (!firstController) PlayImmediateTone(4000, 1);
 			firstController = true;
 		} else {
 				if (firstController) PlayImmediateTone(2000, 1);
