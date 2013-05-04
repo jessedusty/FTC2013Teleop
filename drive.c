@@ -224,7 +224,7 @@ float calculateArmAngle(float degrees) {
 void armAngleD() {
 	//if (joy2Btn(4)) rArmAngle += 100;
 	//if (joy2Btn(2)) rArmAngle -= 100;
-	if (abs(joystick.joy2_y1) > 10){ rArmAngle += joystick.joy2_y1; currentstage = -2;}
+	if (abs(joystick.joy1_y1) > 10){ rArmAngle += joystick.joy1_y1; currentstage = -2;}
 	rArmAngle = withinval(0, calculateArmAngle(90), rArmAngle); // 9000
 	armAngle = -1 * motorPowerCalc(rArmAngle, cArmAngle, 50, 10, 50, 70);
 	motor[ringLifterAngle] = armAngle;
@@ -236,7 +236,7 @@ void grabberWrist()
 {
 	///if (abs(joystick.joy2_y2) > 10) { rGripperWrist += joystick.joy2_y2; currentstage = -2;}
 	int offset = 0;
-	if (joystick.joy2_y2 > 50) { offset = 400; } else if (joystick.joy2_y2 < -50) { offset = -400; }
+	if (joystick.joy1_y2 > 50) { offset = 400; } else if (joystick.joy1_y2 < -50) { offset = -400; }
 
 	rGripperWrist = calculateGripperAngle(cArmAngle) + offset;
 	rGripperWrist = withinval(-3000, 0, rGripperWrist);
@@ -246,8 +246,8 @@ void grabberWrist()
 float otherval;
 void armLengthD()
 {
-	if (joystick.joy2_TopHat == 0) { rArmLength += 80; currentstage = -2;}
-	if (joystick.joy2_TopHat == 4) { rArmLength -= 80; currentstage = -2;}
+	if (joystick.joy1_TopHat == 0) { rArmLength += 80; currentstage = -2;}
+	if (joystick.joy1_TopHat == 4) { rArmLength -= 80; currentstage = -2;}
 
 	rArmLength = withinval(0, 6000, rArmLength);
 	otherval = -1 * motorPowerCalc(rArmLength, cArmLength, 50, 10, 40, 60);
@@ -263,15 +263,15 @@ void armRotateD()
 
 void endOfArmServos()
 {
-	if (firstController]) {
+	if (firstController) {
 		//if(joy1Btn(7)) servo[whiteGripper] = 120;
 		//if(joy1Btn(8)) servo[orangeGripper] = 64;
 	} else {
-		if(joy2Btn(5)) servo[whiteGripper] = 179;
-		if(joy2Btn(6)) servo[orangeGripper] = 123;
+		if(joy1Btn(5)) servo[whiteGripper] = 179;
+		if(joy1Btn(6)) servo[orangeGripper] = 123;
 
-		if(joy2Btn(7)) servo[whiteGripper] = 61;
-		if(joy2Btn(8)) servo[orangeGripper] = 5;
+		if(joy1Btn(7)) servo[whiteGripper] = 61;
+		if(joy1Btn(8)) servo[orangeGripper] = 5;
 		if(abs(joystick.joy2_x2) > 10) { gripperarmrotate += joystick.joy2_x2 / 15; currentstage = -2;}
 		gripperarmrotate = withinval(0, 180, gripperarmrotate);
 		servo[rotateGripper] = gripperarmrotate;
@@ -464,7 +464,7 @@ task main() {
 			PlayImmediateTone(4000, 1);
 			firstController = true;
 		} else {
-				if (firstController) { PlayImmediateTone(2000);}
+				if (firstController) PlayImmediateTone(2000, 1);
 				firstController = false;
 		}
 
