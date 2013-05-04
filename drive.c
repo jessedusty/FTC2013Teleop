@@ -232,15 +232,19 @@ void armAngleD() {
 float calculateGripperAngle(float degrees) {
 	return ((-0.343889682708415 * degrees) - 404) ; //128 deg for in line with Arm
 }
+
+int offset = 0;
 void grabberWrist()
 {
 	///if (abs(joystick.joy2_y2) > 10) { rGripperWrist += joystick.joy2_y2; currentstage = -2;}
-	int offset = 0;
-	if (joystick.joy1_y2 > 50) { offset = 400; } else if (joystick.joy1_y2 < -50) { offset = -400; }
+	//
+
+	offset = joystick.joy1_y2 * 10;
+	//if (joystick.joy1_y2 > 50) { offset = 400; } else if (joystick.joy1_y2 < -50) { offset = -400; }
 
 	rGripperWrist = calculateGripperAngle(cArmAngle) + offset;
 	rGripperWrist = withinval(-3000, 0, rGripperWrist);
-	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 20, 10, 25, 70);
+	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 10, 10, 25, 70);
 	motor[gripperWrist] = ggripperWrist;
 }
 float otherval;
@@ -272,7 +276,7 @@ void endOfArmServos()
 
 		if(joy1Btn(7)) servo[whiteGripper] = 61;
 		if(joy1Btn(8)) servo[orangeGripper] = 5;
-		if(abs(joystick.joy2_x2) > 10) { gripperarmrotate += joystick.joy2_x2 / 15; currentstage = -2;}
+		if(abs(joystick.joy1_x2) > 10) { gripperarmrotate += joystick.joy1_x2 / 15; currentstage = -2;}
 		gripperarmrotate = withinval(0, 180, gripperarmrotate);
 		servo[rotateGripper] = gripperarmrotate;
 	}
