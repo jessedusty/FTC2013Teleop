@@ -31,6 +31,8 @@ bool isRunning = true; // specifies wether the robot is not in E-STOP mode - wil
 int quadrent = 0;
 bool driverslew = true;
 
+bool firstController = false; // designates wether the drive mode is controller 1 or controller 2 for single control operation
+
 bool heighthold = false;
 // values set throughout the program
 
@@ -261,18 +263,19 @@ void armRotateD()
 
 void endOfArmServos()
 {
+	if (firstController]) {
+		//if(joy1Btn(7)) servo[whiteGripper] = 120;
+		//if(joy1Btn(8)) servo[orangeGripper] = 64;
+	} else {
+		if(joy2Btn(5)) servo[whiteGripper] = 179;
+		if(joy2Btn(6)) servo[orangeGripper] = 123;
 
-	if(joy1Btn(7)) servo[whiteGripper] = 120;
-	if(joy1Btn(8)) servo[orangeGripper] = 64;
-
-	if(joy2Btn(5)) servo[whiteGripper] = 179;
-	if(joy2Btn(6)) servo[orangeGripper] = 123;
-
-	if(joy2Btn(7)) servo[whiteGripper] = 61;
-	if(joy2Btn(8)) servo[orangeGripper] = 5;
-	if(abs(joystick.joy2_x2) > 10) { gripperarmrotate += joystick.joy2_x2 / 15; currentstage = -2;}
-	gripperarmrotate = withinval(0, 180, gripperarmrotate);
-	servo[rotateGripper] = gripperarmrotate;
+		if(joy2Btn(7)) servo[whiteGripper] = 61;
+		if(joy2Btn(8)) servo[orangeGripper] = 5;
+		if(abs(joystick.joy2_x2) > 10) { gripperarmrotate += joystick.joy2_x2 / 15; currentstage = -2;}
+		gripperarmrotate = withinval(0, 180, gripperarmrotate);
+		servo[rotateGripper] = gripperarmrotate;
+	}
 }
 
 void doneMovingTo () {
@@ -390,13 +393,16 @@ void positionSaving () {
 
 void accessoryControl()
 {
-	positionSaving();
+	//positionSaving();
 
 	grabberWrist();
+	if (!firstController) {
 	armAngleD();
 	armLengthD();
 	armRotateD();
+}
 	endOfArmServos();
+
 }
 
 // motor manager takes in the target positon in inches of extremities
@@ -454,8 +460,23 @@ task main() {
 		getJoystickSettings(joystick);
 		GetNewEncoderVals();
 
-		driving_joystick();
+		if (joy1Btn(2)) {
+			PlayImmediateTone(4000, 1);
+			firstController = true;
+		} else {
+				if (firstController) { PlayImmediateTone(2000);}
+				firstController = false;
+		}
+
+		if (firstController) {
+			driving_joystick();
+		} else {
+			motor[leftDrive] = 0;
+			motor[rightDrive] = 0;
+		}
+
 		accessoryControl();
+
 		batterycheck();
 
 
