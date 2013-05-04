@@ -244,7 +244,7 @@ void grabberWrist()
 
 	rGripperWrist = calculateGripperAngle(cArmAngle) + offset;
 	rGripperWrist = withinval(-3000, 0, rGripperWrist);
-	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 10, 10, 25, 70);
+	ggripperWrist = motorPowerCalc(rGripperWrist, cGripperWrist, 20, 10, 25, 70);
 	motor[gripperWrist] = ggripperWrist;
 }
 float otherval;
@@ -270,7 +270,7 @@ void endOfArmServos()
 	if (firstController) {
 		//if(joy1Btn(7)) servo[whiteGripper] = 120;
 		//if(joy1Btn(8)) servo[orangeGripper] = 64;
-	} else {
+		} else {
 		if(joy1Btn(5)) servo[whiteGripper] = 179;
 		if(joy1Btn(6)) servo[orangeGripper] = 123;
 
@@ -338,7 +338,7 @@ void gotoposition (int position, int type) {
 
 void setuppermspots () {
 
-//	preSavedPositions[3].armBaseRot = 428;
+	//	preSavedPositions[3].armBaseRot = 428;
 
 	//'preSavedPositions[1].
 
@@ -401,10 +401,10 @@ void accessoryControl()
 
 	grabberWrist();
 	if (!firstController) {
-	armAngleD();
-	armLengthD();
-	armRotateD();
-}
+		armAngleD();
+		armLengthD();
+		armRotateD();
+	}
 	endOfArmServos();
 
 }
@@ -467,14 +467,14 @@ task main() {
 		if (joy1Btn(2)) {
 			if (!firstController) PlayImmediateTone(4000, 1);
 			firstController = true;
-		} else {
-				if (firstController) PlayImmediateTone(2000, 1);
-				firstController = false;
+			} else {
+			if (firstController) PlayImmediateTone(2000, 1);
+			firstController = false;
 		}
 
 		if (firstController) {
 			driving_joystick();
-		} else {
+			} else {
 			motor[leftDrive] = 0;
 			motor[rightDrive] = 0;
 		}
