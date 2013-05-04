@@ -73,7 +73,7 @@ void joyval_joystick1st() { // standard mode on left joystick
 }
 
 void joyval_joystick1rv() { // reverse mode on left joystick
-	leftstickval = pow(((float)joystick.joy1_y2 / (float)64 * (float)5), 2) ;
+	leftstickval = pow(((float)joystick.joy1_y1 / (float)64 * (float)5), 2) ;
 	if (joystick.joy1_y2 < 0) leftstickval = leftstickval * -1.0;
 
 	rightstickval = pow(((float)joystick.joy1_x1 / (float)64 * (float)5), 2) ;
@@ -81,15 +81,15 @@ void joyval_joystick1rv() { // reverse mode on left joystick
 }
 
 void joyval_joystick2st() { // standard mode on right joystick
-	leftstickval = pow(((float)joystick.joy2_y1 / (float)64 * (float)5), 2) ;
-	if (joystick.joy2_y1 < 0) leftstickval = leftstickval * -1.0;
+	leftstickval = pow(((float)joystick.joy1_y1 / (float)64 * (float)5), 2) ;
+	if (joystick.joy1_y1 < 0) leftstickval = leftstickval * -1.0;
 
-	rightstickval = pow(((float)joystick.joy2_x2 / (float)64 * (float)5), 2) ;
-	if (joystick.joy2_x2 < 0) rightstickval = rightstickval * -1.0;
+	rightstickval = pow(((float)joystick.joy1_x1 / (float)64 * (float)5), 2) ;
+	if (joystick.joy1_x2 < 0) rightstickval = rightstickval * -1.0;
 }
 
 void joyval_joystick2rv() { // reverse mode on right joystick
-	leftstickval = pow(((float)joystick.joy2_y2 / (float)64 * (float)5), 2) ;
+	leftstickval = pow(((float)joystick.joy2_y1 / (float)64 * (float)5), 2) ;
 	if (joystick.joy2_y2 < 0) leftstickval = leftstickval * -1.0;
 
 	rightstickval = pow(((float)joystick.joy2_x1 / (float)64 * (float)5), 2) ;
@@ -99,17 +99,17 @@ void joyval_joystick2rv() { // reverse mode on right joystick
 //discover the values for use in the driving routine (using above methods)
 
 void joyval_correct() {
-	if ((normalctl) & (rev == 1)) {
-		joyval_joystick1st();
-		} else if ((normalctl) & (rev == -1)) {
-		joyval_joystick1rv();
-		} else if ((!normalctl) & (rev == 1)) {
+	//if ((normalctl) & (rev == 1)) {
+	//	joyval_joystick1st();
+	//	} else if ((normalctl) & (rev == -1)) {
+	//	joyval_joystick1rv();
+	//	} else if ((!normalctl) & (rev == 1)) {
 		joyval_joystick2st();
-		} else if ((!normalctl) & (rev == -1)) {
-		joyval_joystick2rv();
-		} else {
-		PlayImmediateTone(500, 1);
-	}
+		//} else if ((!normalctl) & (rev == -1)) {
+		//joyval_joystick2rv();
+		//} else {
+		//PlayImmediateTone(500, 1);
+	//}
 	leftstickval = leftstickval * rev;
 	if (abs(leftstickval) < forwardbackwardthresh) leftstickval = 0;
 	//rightstickval = rightstickval * -1.0
